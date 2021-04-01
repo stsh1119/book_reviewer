@@ -3,15 +3,14 @@ from flask_jwt_extended import get_jwt_identity, create_access_token, jwt_requir
 from pydantic import ValidationError
 from .dto import UserRegisterDto, UserLoginDto
 from .service import register_user, login_user
+from book_reviewer.utils import json_body_required
 
 auth = Blueprint('auth', __name__)
 
 
 @auth.route('/register', methods=["POST"])
+@json_body_required
 def register():
-    if not request.json:
-        return jsonify(message='Missing request body'), 400
-
     try:
         user = UserRegisterDto.parse_obj(request.json)
         register_user(user)
@@ -23,6 +22,7 @@ def register():
 
 
 @auth.route("/login", methods=["POST"])
+@json_body_required
 def login():
     try:
         user_data = UserLoginDto.parse_obj(request.json)
