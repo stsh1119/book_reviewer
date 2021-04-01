@@ -1,6 +1,7 @@
+from typing import Union
 from flask_jwt_extended import create_refresh_token, create_access_token
 from sqlalchemy.exc import IntegrityError
-from .dto import UserRegisterDto, UserLoginDto
+from .dto import UserRegisterDto, UserLoginDto, UserChangePwdDto
 from book_reviewer.models import db, User
 from book_reviewer import bcrypt
 
@@ -19,7 +20,7 @@ def register_user(user: UserRegisterDto) -> None:
         raise Exception('User with this email is already registered.')
 
 
-def login_user(user: UserLoginDto):
+def login_user(user: UserLoginDto) -> Union[dict, str]:
     try:
         db_user = User.query.filter_by(email=user.email).first()
         if not db_user:
@@ -36,3 +37,13 @@ def login_user(user: UserLoginDto):
 
     except Exception as e:
         return str(e)
+
+
+def change_pwd(user: UserChangePwdDto, email) -> None:
+    db_user = User.query.filter_by(email=email).first_or_404()
+
+    if not bcrypt.check_password_hash(db_user.password, user.old_password):
+        raise Exception("Error: incorrect old password")
+
+    db_user.password = bcrypt.generate_password_hash(user.new_password).decode('utf-8')
+    db.session.commit()
