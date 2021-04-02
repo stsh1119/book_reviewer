@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from pydantic import BaseModel, constr
 
 db = SQLAlchemy()
 
@@ -18,6 +19,7 @@ class User(db.Model):
 class BookReview(db.Model):
     __tablename__ = 'book_reviews'
     id = db.Column(db.Integer, primary_key=True)
+    book = db.Column(db.String(50), nullable=False)
     title = db.Column(db.String(50), nullable=False)
     review_text = db.Column(db.String(500), nullable=False)
     category = db.Column(db.String(50), default='Uncategorized')
@@ -39,3 +41,15 @@ class Reaction(db.Model):
     def __repr__(self):
         return f"Reaction('{self.id}', '{self.reacted_user}', '{self.reacted_post}',\
             '{self.reaction_type}' ,'{self.creation_date}')"
+
+
+class BookReviewModel(BaseModel):
+    id: int
+    book: constr(max_length=50)
+    title: constr(max_length=50)
+    review_text: constr(max_length=500)
+    category: constr(max_length=50)
+    creation_date: datetime
+
+    class Config:
+        orm_mode = True
