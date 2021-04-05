@@ -17,8 +17,8 @@ books = Blueprint('books', __name__)
 def add_new_review():
     try:
         review_creation_data = CreateReviewDto.parse_obj(request.json)
-        add_review(review_creation_data, email=get_jwt_identity())
-        return jsonify('Book review was added'), 201
+        result = add_review(review_creation_data, email=get_jwt_identity())
+        return jsonify(result), 201
 
     except ValidationError as e:
         return e.json(), 400

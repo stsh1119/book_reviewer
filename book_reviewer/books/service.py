@@ -1,11 +1,12 @@
 from ..models import (db, User, BookReview, BookReviewSchema, ReviewCategory,
                       ReviewCategorySchema, Reaction, Subscription)
 from .dto import CreateReviewDto
+from book_reviewer.tasks import send_notification_email
 
 ITEMS_PER_PAGE = 20
 
 
-def add_review(review: CreateReviewDto, email: str) -> None:
+def add_review(review: CreateReviewDto, email: str) -> str:
     user = User.query.filter_by(email=email).first_or_404()
     existing_categories = [category.id for category in ReviewCategory.query.all()]
 
@@ -20,6 +21,15 @@ def add_review(review: CreateReviewDto, email: str) -> None:
                              )
     db.session.add(book_review)
     db.session.commit()
+
+    users_to_notify = Subscription.query.filter_by(subscription_category=review.category).all()
+    user_emails = [user.user_email for user in users_to_notify]
+
+    if user_emails:
+        send_notification_email.delay(users_list=user_emails, review_category=review.category)
+        return 'Book review was added'
+
+    return 'Book review was added'
 
 
 def all_reviews_for_book(book_name: str, page_number: int = 1) -> list:
