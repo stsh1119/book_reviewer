@@ -1,4 +1,5 @@
-from ..models import db, User, BookReview, BookReviewSchema, ReviewCategory, ReviewCategorySchema, Reaction
+from ..models import (db, User, BookReview, BookReviewSchema, ReviewCategory,
+                      ReviewCategorySchema, Reaction, Subscription)
 from .dto import CreateReviewDto
 
 ITEMS_PER_PAGE = 20
@@ -92,3 +93,38 @@ def unlike_review(review_id: int, user_email: str) -> str:
         return 'Your reaction was removed.'
 
     return 'You have not reacted to this post.'
+
+
+def sign_up_for_email_notifications(category_id: int, email: str) -> str:
+    category = ReviewCategory.query.filter_by(id=category_id).first_or_404()
+    is_already_subscribed = Subscription.query.filter_by(user_email=email,
+                                                         subscription_category=category.id
+                                                         ).first()
+    if not is_already_subscribed:
+        subscription = Subscription(user_email=email,
+                                    subscription_category=category.id)
+        db.session.add(subscription)
+        db.session.commit()
+        return f'{email} has signed up for {category.category_name}.'
+
+    return f'{email} is already signed up for {category.category_name}.'
+
+
+def unsubscribe_from_email_notifications(category_id: int, email: str) -> str:
+    subscription = Subscription.query.filter_by(user_email=email,
+                                                subscription_category=category_id
+                                                ).first()
+    if subscription:
+        db.session.delete(subscription)
+        db.session.commit()
+        return f'{email} cancelled subscription for {subscription.subscription_category}.'
+
+    return f'{email} is not subscribed for {category_id}.'
+
+
+def view_my_subscriptions(email: str) -> [list, str]:
+    subscriptions = Subscription.query.filter_by(user_email=email).all()
+    if subscriptions:
+        subscriptions_list = [subscriptions.subscription_category for subscriptions in subscriptions]
+        return subscriptions_list
+    return f'{email} does not have any subscriptions'
