@@ -8,26 +8,25 @@ ITEMS_PER_PAGE = 20
 
 def add_review(review: CreateReviewDto, email: str) -> str:
     user = User.query.filter_by(email=email).first_or_404()
-    existing_categories = [category.id for category in ReviewCategory.query.all()]
+    existing_categories = {review.id: review.category_name for review in ReviewCategory.query.all()}
 
-    if review.category not in existing_categories:
+    if review.category_id not in existing_categories.keys() and review.category_id:
         raise Exception("No such category: either skip this parameter, or replace it with a valid one.")
 
     book_review = BookReview(book=review.book,
                              title=review.title,
                              review_text=review.review_text,
-                             category_id=review.category,
+                             category_id=review.category_id,
                              user=user.id
                              )
     db.session.add(book_review)
     db.session.commit()
 
-    users_to_notify = Subscription.query.filter_by(subscription_category=review.category).all()
+    users_to_notify = Subscription.query.filter_by(subscription_category=review.category_id).all()
     user_emails = [user.user_email for user in users_to_notify]
 
     if user_emails:
-        category_name = ReviewCategory.query.filter_by(id=review.category).first().category_name
-        send_notification_email.delay(users_list=user_emails, review_category=category_name)
+        send_notification_email.delay(users_list=user_emails, review_category=existing_categories[review.category_id])
         return 'Book review was added'
 
     return 'Book review was added'
