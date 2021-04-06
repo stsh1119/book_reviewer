@@ -1,18 +1,16 @@
-import os
 from flask import Flask
 from flask_jwt_extended import JWTManager
 from flask_bcrypt import Bcrypt
 from .models import db
-from book_reviewer.tasks import mail
+from book_reviewer.background.tasks import mail
 from .config import Config
-from .celery_utils import init_celery
+from book_reviewer.background.celery_utils import init_celery
 
 jwt_manager = JWTManager()
 bcrypt = Bcrypt()
-PKG_NAME = os.path.dirname(os.path.realpath(__file__)).split("/")[-1]
 
 
-def create_app(app_name=PKG_NAME, config_class=Config, **kwargs):
+def create_app(config_class=Config, **kwargs):
     app = Flask(__name__)
     app.config.from_object(config_class)
     if kwargs.get("celery"):
