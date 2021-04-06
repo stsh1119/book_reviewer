@@ -12,6 +12,6 @@ def send_notification_email(users_list: list, review_category: str):
                       sender='shulga.s1337@gmail.com',
                       recipients=user.split())
         msg.body = f"""Hello, {user},
-New fork was added to {review_category}
+New book review was added to {review_category}
 """
     mail.send(msg)
