@@ -6,7 +6,7 @@ mail = Mail()
 
 @celery.task()
 def send_notification_email(users_list: list, review_category: str):
-    """Sends an email to a list of users, subscribed to some fork category."""
+    """Sends an email to a list of users, subscribed to some review category."""
     for user in users_list:
         msg = Message('New review added!',
                       sender='shulga.s1337@gmail.com',
