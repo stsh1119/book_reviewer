@@ -8,9 +8,7 @@ mail = Mail()
 def send_notification_email(users_list: list, review_category: str):
     """Sends an email to a list of users, subscribed to some review category."""
     for user in users_list:
-        msg = Message('New review added!',
-                      sender='shulga.s1337@gmail.com',
-                      recipients=user.split())
+        msg = Message('New review added!', sender='shulga.s1337@gmail.com', recipients=user.split())
         msg.body = f"""Hello, {user},
 New book review was added to {review_category}
 """

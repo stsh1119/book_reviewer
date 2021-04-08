@@ -15,8 +15,10 @@ def register():
         user = UserRegisterDto.parse_obj(request.json)
         register_user(user)
         return jsonify(message='Successfully registered.'), 201
+
     except ValidationError as e:
         return e.json(), 400
+
     except Exception as e:
         return jsonify(message=str(e)), 400
 
@@ -28,8 +30,10 @@ def login():
         user_data = UserLoginDto.parse_obj(request.json)
         tokens = login_user(user_data)
         return jsonify(tokens), 200
+
     except ValidationError as e:
         return e.json(), 400
+
     except Exception as e:
         return jsonify(message=str(e)), 400
 
@@ -50,7 +54,9 @@ def change_password():
         user_data = UserChangePwdDto.parse_obj(request.json)
         change_pwd(user_data, email=get_jwt_identity())
         return jsonify(message='Password was changed'), 200
+
     except ValidationError as e:
         return e.json(), 400
+
     except Exception as e:
         return jsonify(str(e)), 400

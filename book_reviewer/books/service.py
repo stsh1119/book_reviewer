@@ -13,12 +13,13 @@ def add_review(review: CreateReviewDto, email: str) -> str:
     if review.category_id not in existing_categories.keys() and review.category_id:
         raise Exception("No such category: either skip this parameter, or replace it with a valid one.")
 
-    book_review = BookReview(book=review.book,
-                             title=review.title,
-                             review_text=review.review_text,
-                             category_id=review.category_id,
-                             user=user.id
-                             )
+    book_review = BookReview(
+        book=review.book,
+        title=review.title,
+        review_text=review.review_text,
+        category_id=review.category_id,
+        user=user.id
+    )
     db.session.add(book_review)
     db.session.commit()
 
@@ -33,10 +34,10 @@ def add_review(review: CreateReviewDto, email: str) -> str:
 
 
 def all_reviews_for_book(book_name: str, page_number: int = 1) -> list:
-    books = BookReview.query.filter_by(book=book_name).paginate(page=page_number,
-                                                                per_page=ITEMS_PER_PAGE,
-                                                                error_out=False
-                                                                ).items
+    books = BookReview.query.filter_by(book=book_name).paginate(
+        page=page_number,
+        per_page=ITEMS_PER_PAGE,
+        error_out=False).items
     books_list = [BookReviewSchema.from_orm(book).dict() for book in books]
 
     return books_list
@@ -67,9 +68,7 @@ def all_reviews_under_certain_category(category_name: str, page_number: int = 1)
 
 def all_reviews_made_by_user(user_email: str, page_number: int = 1) -> list:
     user = User.query.filter_by(email=user_email).first_or_404()
-    reviews_made_by_user = user.user_reviews.paginate(page=page_number,
-                                                      per_page=ITEMS_PER_PAGE,
-                                                      error_out=False).items
+    reviews_made_by_user = user.user_reviews.paginate(page=page_number, per_page=ITEMS_PER_PAGE, error_out=False).items
 
     serialized_reviews = [BookReviewSchema.from_orm(review).dict() for review in reviews_made_by_user]
 
@@ -81,11 +80,9 @@ def like_review(review_id: int, user_email: str) -> str:
     user_id = User.query.filter_by(email=user_email).first().id
 
     reaction_exists = Reaction.query.filter_by(reacted_post=review.id, reacted_user=user_id).first()
+
     if not reaction_exists:
-        reaction = Reaction(reacted_user=user_id,
-                            reacted_post=review.id,
-                            reaction_type='like',
-                            )
+        reaction = Reaction(reacted_user=user_id, reacted_post=review.id, reaction_type='like',)
         db.session.add(reaction)
         db.session.commit()
         return 'Post was liked.'
@@ -107,12 +104,10 @@ def unlike_review(review_id: int, user_email: str) -> str:
 
 def sign_up_for_email_notifications(category_id: int, email: str) -> str:
     category = ReviewCategory.query.filter_by(id=category_id).first_or_404()
-    is_already_subscribed = Subscription.query.filter_by(user_email=email,
-                                                         subscription_category=category.id
-                                                         ).first()
+    is_already_subscribed = Subscription.query.filter_by(user_email=email, subscription_category=category.id).first()
+
     if not is_already_subscribed:
-        subscription = Subscription(user_email=email,
-                                    subscription_category=category.id)
+        subscription = Subscription(user_email=email, subscription_category=category.id)
         db.session.add(subscription)
         db.session.commit()
         return f'{email} has signed up for {category.category_name}.'
@@ -121,9 +116,7 @@ def sign_up_for_email_notifications(category_id: int, email: str) -> str:
 
 
 def unsubscribe_from_email_notifications(category_id: int, email: str) -> str:
-    subscription = Subscription.query.filter_by(user_email=email,
-                                                subscription_category=category_id
-                                                ).first()
+    subscription = Subscription.query.filter_by(user_email=email, subscription_category=category_id).first()
     if subscription:
         db.session.delete(subscription)
         db.session.commit()
@@ -137,4 +130,5 @@ def view_my_subscriptions(email: str) -> [list, str]:
     if subscriptions:
         subscriptions_list = [subscriptions.subscription_category for subscriptions in subscriptions]
         return subscriptions_list
+
     return f'{email} does not have any subscriptions'

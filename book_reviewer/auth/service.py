@@ -8,10 +8,7 @@ from book_reviewer import bcrypt
 
 def register_user(user: UserRegisterDto) -> None:
     hashed_password = bcrypt.generate_password_hash(user.password).decode('utf-8')
-    user = User(
-                email=user.email,
-                password=hashed_password,
-                )
+    user = User(email=user.email, password=hashed_password,)
     try:
         db.session.add(user)
         db.session.commit()
