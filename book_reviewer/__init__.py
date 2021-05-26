@@ -23,9 +23,11 @@ def create_app(config_class=Config, **kwargs):
 
     from book_reviewer.auth.routes import auth
     from book_reviewer.book_reviews.routes import book_reviews
+    from book_reviewer.categories.routes import categories
     from book_reviewer.errors.handlers import errors
     app.register_blueprint(auth)
     app.register_blueprint(book_reviews)
+    app.register_blueprint(categories)
     app.register_blueprint(errors)
 
     return app

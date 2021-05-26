@@ -1,5 +1,4 @@
-from ..models import (db, User, BookReview, BookReviewSchema, ReviewCategory,
-                      ReviewCategorySchema, Reaction, Subscription)
+from ..models import db, User, BookReview, BookReviewSchema, ReviewCategory, Reaction, Subscription
 from .dto import CreateReviewDto
 from book_reviewer.background.tasks import send_notification_email
 
@@ -48,22 +47,6 @@ def all_reviews_for_all_books(page_number: int = 1) -> list:
     books_list = [BookReviewSchema.from_orm(book).dict() for book in books]
 
     return books_list
-
-
-def all_categories_for_books() -> list:
-    categories = ReviewCategory.query.all()
-    category_names_list = [ReviewCategorySchema.from_orm(category).dict() for category in categories]
-
-    return category_names_list
-
-
-def all_reviews_under_certain_category(category_name: str, page_number: int = 1) -> list:
-    needed_category = ReviewCategory.query.filter_by(category_name=category_name).first_or_404()
-    reviews = needed_category.reviews.paginate(page=page_number, per_page=ITEMS_PER_PAGE).items
-
-    reviews_under_category = [BookReviewSchema.from_orm(review).dict() for review in reviews]
-
-    return reviews_under_category
 
 
 def all_reviews_made_by_user(user_email: str, page_number: int = 1) -> list:

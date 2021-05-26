@@ -3,9 +3,9 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from pydantic import ValidationError
 from book_reviewer.utils import json_body_required
 from .dto import CreateReviewDto
-from .service import (add_review, all_reviews_for_book, all_reviews_for_all_books, all_categories_for_books,
-                      all_reviews_under_certain_category, all_reviews_made_by_user, like_review, unlike_review,
-                      sign_up_for_email_notifications, unsubscribe_from_email_notifications, view_my_subscriptions)
+from .service import (add_review, all_reviews_for_book, all_reviews_for_all_books, all_reviews_made_by_user,
+                      like_review, unlike_review, sign_up_for_email_notifications,
+                      unsubscribe_from_email_notifications, view_my_subscriptions)
 
 
 book_reviews = Blueprint('book_reviews', __name__)
@@ -41,22 +41,6 @@ def view_all_reviews_for_a_book(book):
 def view_all_reviews_for_all_books():
     page_num: int = int(request.args.get('page', default=1))
     result = all_reviews_for_all_books(page_num)
-
-    return jsonify(result), 200
-
-
-@book_reviews.route("/categories", methods=['GET'])
-@jwt_required(optional=True)
-def view_all_categories_for_books():
-    result = all_categories_for_books()
-    return jsonify(result), 200
-
-
-@book_reviews.route("/categories/<string:category_name>", methods=['GET'])
-@jwt_required(optional=True)
-def view_all_reviews_under_given_category(category_name):
-    page_num = int(request.args.get('page', default=1))
-    result = all_reviews_under_certain_category(category_name, page_num)
 
     return jsonify(result), 200
 
