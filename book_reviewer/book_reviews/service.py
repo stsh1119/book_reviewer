@@ -9,7 +9,7 @@ def add_review(review: CreateReviewDto, email: str) -> str:
     user = User.query.filter_by(email=email).first_or_404()
     existing_categories = {review.id: review.category_name for review in ReviewCategory.query.all()}
 
-    if review.category_id not in existing_categories.keys() and review.category_id:
+    if review.category_id not in existing_categories.keys():
         raise Exception("No such category: either skip this parameter, or replace it with a valid one.")
 
     book_review = BookReview(
