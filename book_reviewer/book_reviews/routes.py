@@ -11,7 +11,7 @@ from .service import (add_review, all_reviews_for_book, all_reviews_for_all_book
 book_reviews = Blueprint('book_reviews', __name__)
 
 
-@book_reviews.route('/add_review', methods=['POST'])
+@book_reviews.post('/add_review')
 @json_body_required
 @jwt_required()
 def add_new_review():
@@ -27,7 +27,7 @@ def add_new_review():
         return jsonify(str(e)), 400
 
 
-@book_reviews.route("/reviews/<string:book>", methods=['GET'])
+@book_reviews.get("/reviews/<string:book>")
 @jwt_required(optional=True)
 def view_all_reviews_for_a_book(book):
     page_num = int(request.args.get('page', default=1))
@@ -36,7 +36,7 @@ def view_all_reviews_for_a_book(book):
     return jsonify(result), 200
 
 
-@book_reviews.route("/reviews/all", methods=['GET'])
+@book_reviews.get("/reviews/all")
 @jwt_required(optional=True)
 def view_all_reviews_for_all_books():
     page_num: int = int(request.args.get('page', default=1))
@@ -45,7 +45,7 @@ def view_all_reviews_for_all_books():
     return jsonify(result), 200
 
 
-@book_reviews.route("/<string:user>/reviews", methods=['GET'])
+@book_reviews.get("/<string:user>/reviews")
 @jwt_required(optional=True)
 def view_all_reviews_under_user(user):
     page_num = int(request.args.get('page', default=1))
@@ -54,7 +54,7 @@ def view_all_reviews_under_user(user):
     return jsonify(result), 200
 
 
-@book_reviews.route("/my_reviews", methods=['GET'])
+@book_reviews.get("/my_reviews", methods=['GET'])
 @jwt_required()
 def view_reviews_under_current_user():
     page_num = int(request.args.get('page', default=1))
@@ -63,33 +63,33 @@ def view_reviews_under_current_user():
     return jsonify(result), 200
 
 
-@book_reviews.route("/reviews/<int:review_id>/like", methods=['POST'])
+@book_reviews.post("/reviews/<int:review_id>/like")
 @jwt_required()
 def like_a_review(review_id):
     result = like_review(review_id, get_jwt_identity())
     return jsonify(result), 200
 
 
-@book_reviews.route("/reviews/<int:review_id>/unlike", methods=['DELETE'])
+@book_reviews.delete("/reviews/<int:review_id>/unlike")
 @jwt_required()
 def unlike_a_review(review_id):
     result = unlike_review(review_id, get_jwt_identity())
     return jsonify(result), 200
 
 
-@book_reviews.route("/sign_up/<int:category_id>", methods=['POST'])
+@book_reviews.post("/sign_up/<int:category_id>")
 @jwt_required()
 def sign_up_for_notifications(category_id):
     return jsonify(sign_up_for_email_notifications(category_id, get_jwt_identity())), 200
 
 
-@book_reviews.route("/remove_subscription/<int:category_id>", methods=['DELETE'])
+@book_reviews.delete("/remove_subscription/<int:category_id>")
 @jwt_required()
 def remove_email_notifications(category_id):
     return jsonify(unsubscribe_from_email_notifications(category_id, get_jwt_identity())), 200
 
 
-@book_reviews.route("/view_subscriptions", methods=['GET'])
+@book_reviews.get("/view_subscriptions")
 @jwt_required()
 def view_subscriptions():
     return jsonify(view_my_subscriptions(get_jwt_identity())), 200

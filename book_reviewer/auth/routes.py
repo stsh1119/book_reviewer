@@ -8,7 +8,7 @@ from book_reviewer.utils import json_body_required
 auth = Blueprint('auth', __name__)
 
 
-@auth.route('/register', methods=["POST"])
+@auth.post('/register')
 @json_body_required
 def register():
     try:
@@ -23,7 +23,7 @@ def register():
         return jsonify(message=str(e)), 400
 
 
-@auth.route("/login", methods=["POST"])
+@auth.post("/login")
 @json_body_required
 def login():
     try:
@@ -38,7 +38,7 @@ def login():
         return jsonify(message=str(e)), 400
 
 
-@auth.route("/refresh", methods=["POST"])
+@auth.post("/refresh")
 @jwt_required(refresh=True)
 def refresh():
     identity = get_jwt_identity()
@@ -46,7 +46,7 @@ def refresh():
     return jsonify(access_token=access_token), 200
 
 
-@auth.route("/change_password", methods=['POST'])
+@auth.post("/change_password")
 @jwt_required()
 @json_body_required
 def change_password():

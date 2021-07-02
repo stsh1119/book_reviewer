@@ -6,14 +6,14 @@ from .service import all_categories_for_books, all_reviews_under_certain_categor
 categories = Blueprint('categories', __name__)
 
 
-@categories.route("/categories", methods=['GET'])
+@categories.get("/categories")
 @jwt_required(optional=True)
 def view_all_categories_for_books():
     result = all_categories_for_books()
     return jsonify(result), 200
 
 
-@categories.route("/categories/<int:category_id>", methods=['GET'])
+@categories.get("/categories/<int:category_id>")
 @jwt_required(optional=True)
 def view_all_reviews_under_given_category(category_id):
     page_num = int(request.args.get('page', default=1))
