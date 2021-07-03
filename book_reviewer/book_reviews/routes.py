@@ -54,7 +54,7 @@ def view_all_reviews_under_user(user):
     return jsonify(result), 200
 
 
-@book_reviews.get("/my_reviews", methods=['GET'])
+@book_reviews.get("/my_reviews")
 @jwt_required()
 def view_reviews_under_current_user():
     page_num = int(request.args.get('page', default=1))
